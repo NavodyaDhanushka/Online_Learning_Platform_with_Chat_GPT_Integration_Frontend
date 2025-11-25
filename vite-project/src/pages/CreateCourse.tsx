@@ -57,7 +57,7 @@ export default function CreateCourse() {
     return (
         <>
             <Navbar />
-            <div className="flex justify-center items-start min-h-screen p-6">
+            <div className="pt-24 p-6 flex flex-col items-center gap-4 min-h-screen">
                 <Card className="w-full max-w-lg">
                     <CardHeader>
                         <CardTitle>Create New Course</CardTitle>

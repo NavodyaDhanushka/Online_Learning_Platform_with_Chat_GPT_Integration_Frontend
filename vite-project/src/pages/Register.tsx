@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState } from "react";
+import Navbar from "@/components/Navbar";
+
 
 const registerSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters"),
@@ -22,81 +23,113 @@ const registerSchema = z.object({
 type RegisterForData = z.infer<typeof registerSchema>;
 
 export default function Register() {
-    const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterForData>({
+    const { register, handleSubmit, formState: { errors }, setValue } = useForm<RegisterForData>({
         resolver: zodResolver(registerSchema)
     });
 
-    const [currentUserRole, setCurrentUserRole] = useState<"student" | "instructor">("student");
+    // Get logged-in user from localStorage (or context)
+    const loggedInUser = JSON.parse(localStorage.getItem("user") || "null");
+    const isInstructor = loggedInUser?.role === "instructor";
 
-    const onSubmit = (data: RegisterForData) => {
-        console.log("Register Data", data);
+    // Only instructors can select both student and instructor roles
+    const availableRoles = isInstructor ? ["student", "instructor"] : ["student"];
+
+    const onSubmit = async (data: RegisterForData) => {
+        try {
+            const response = await fetch("http://localhost:5000/api/users/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert("User registered successfully!");
+                console.log("Response:", result);
+            } else {
+                alert(result.message || "Registration failed");
+                console.error("Error:", result);
+            }
+        } catch (error) {
+            console.error("Network error:", error);
+            alert("Network error. Please try again.");
+        }
     };
 
-     const availableRoles = currentUserRole === "instructor" ? ["student", "instructor"] : ["student"];
 
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-50">
-            <Card className="w-[400px]">
-                <CardHeader>
-                    <CardTitle>Create Account</CardTitle>
-                </CardHeader>
+        <>
+            {isInstructor && <Navbar />}   {/* ✅ Show Navbar only for instructors */}
 
-                <CardContent>
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="flex justify-center items-center min-h-screen bg-gray-50 pt-24">
+                <Card className="w-[400px]">
+                    <CardHeader>
+                        <CardTitle>Create Account</CardTitle>
+                    </CardHeader>
 
-                        {/* Name */}
-                        <div>
-                            <Label>Name</Label>
-                            <Input {...register("name")} placeholder="John Doe" />
-                            {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
-                        </div>
+                    <CardContent>
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
-                        {/* Username */}
-                        <div>
-                            <Label>Username</Label>
-                            <Input {...register("username")} placeholder="johndoe" />
-                            {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
-                        </div>
+                            {/* Name */}
+                            <div>
+                                <Label>Name</Label>
+                                <Input {...register("name")} placeholder="John Doe" />
+                                {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+                            </div>
 
-                        {/* Password */}
-                        <div>
-                            <Label>Password</Label>
-                            <Input type="password" {...register("password")} />
-                            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
-                        </div>
+                            {/* Username */}
+                            <div>
+                                <Label>Username</Label>
+                                <Input {...register("username")} placeholder="johndoe" />
+                                {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
+                            </div>
 
-                        {/* Confirm Password */}
-                        <div>
-                            <Label>Confirm Password</Label>
-                            <Input type="password" {...register("confirmPassword")} />
-                            {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
-                        </div>
+                            {/* Password */}
+                            <div>
+                                <Label>Password</Label>
+                                <Input type="password" {...register("password")} />
+                                {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+                            </div>
 
-                        {/* Role Dropdown */}
-                        <div>
-                            <Label>Role</Label>
-                            <Select onValueChange={(value) => setValue("role", value as "student" | "instructor")}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select role" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {availableRoles.map((role) => (
-                                        <SelectItem key={role} value={role}>{role.charAt(0).toUpperCase() + role.slice(1)}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            {errors.role && <p className="text-red-500 text-sm">{errors.role.message}</p>}
-                        </div>
+                            {/* Confirm Password */}
+                            <div>
+                                <Label>Confirm Password</Label>
+                                <Input type="password" {...register("confirmPassword")} />
+                                {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
+                            </div>
 
-                        <Button type="submit" className="w-full">Register</Button>
+                            {/* Role */}
+                            <div>
+                                <Label>Role</Label>
+                                <Select onValueChange={(value) => setValue("role", value as "student" | "instructor")}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select role" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {availableRoles.map((role) => (
+                                            <SelectItem key={role} value={role}>
+                                                {role.charAt(0).toUpperCase() + role.slice(1)}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.role && <p className="text-red-500 text-sm">{errors.role.message}</p>}
+                            </div>
 
-                        <p className="text-sm text-center mt-2">
-                            Already have an account? <a className="text-blue-500" href="/">Login</a>
-                        </p>
+                            <Button type="submit" className="w-full">Register</Button>
 
-                    </form>
-                </CardContent>
-            </Card>
-        </div>
+                            <p className="text-sm text-center mt-2">
+                                Already have an account? <a className="text-blue-500" href="/login">Login</a>
+                            </p>
+
+                        </form>
+                    </CardContent>
+                </Card>
+            </div>
+        </>
     );
+
 }

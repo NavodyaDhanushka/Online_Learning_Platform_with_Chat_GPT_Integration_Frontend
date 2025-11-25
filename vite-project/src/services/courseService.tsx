@@ -53,3 +53,9 @@ export const getEnrolledUsers = async () => {
     return response.data;
 };
 
+// Get all assign courses for a instructor
+export const getAssignCourses = async () => {
+    const response = await api.get(`/instructor`);
+    return response.data;
+};
+

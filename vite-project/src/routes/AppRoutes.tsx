@@ -5,6 +5,7 @@ import Home from "../pages/Home";
 import CourseDetail from "../pages/CourseDetail.tsx";
 import CreateCourse from "@/pages/CreateCourse.tsx";
 import MyCourses from "@/pages/MyCourses.tsx";
+import AiSuggestion from "@/pages/AiSuggestion.tsx";
 
 const AppRoutes = () => {
     return (
@@ -15,7 +16,8 @@ const AppRoutes = () => {
                 <Route path="/register" element={<Register />} />
                 <Route path="/course/:id" element={<CourseDetail />} />
                 <Route path="/create-course" element={<CreateCourse />} />
-                <Route path="/my-course" element={<MyCourses />} />
+                <Route path="/my-courses" element={<MyCourses />} />
+                <Route path="/ai-suggestion" element={<AiSuggestion />} />
             </Routes>
         </BrowserRouter>
     );

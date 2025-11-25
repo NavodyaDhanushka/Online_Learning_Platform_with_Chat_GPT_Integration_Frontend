@@ -4,7 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {zodResolver} from "@hookform/resolvers/zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const loginSchema = z.object({
     username: z.string(),
@@ -18,8 +20,45 @@ export default function Login() {
         resolver: zodResolver (loginSchema),
     });
 
-    const onSubmit = (data: LoginFormData) => {
-        console.log("Login Data:", data);
+    const navigate = useNavigate();
+
+    const onSubmit = async (data: LoginFormData) => {
+        try {
+            const res = await fetch("http://localhost:5000/api/users/login", {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: { "Content-Type": "application/json" },
+            });
+
+            const result = await res.json();
+
+            if (!res.ok) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Login Failed",
+                    text: result.message || "Invalid Credentials",
+                });
+                return;
+            }
+            localStorage.setItem("token", result.token);
+            localStorage.setItem("user", JSON.stringify(result.user));
+
+
+            await Swal.fire({
+                icon: "success",
+                title: "Login Success",
+                text: "Welcome back!",
+                timer: 3000,
+                showConfirmButton: false,
+            });
+            navigate("/");
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops!",
+                text: "Something went wrong. Please try again.",
+            });
+        }
     };
 
     return (
