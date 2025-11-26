@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import Swal from "sweetalert2";
 
-//import { getAiCourseSuggestions } from "@/services/courseService"; // API service you will create
+import { getAiCourseSuggestions } from "@/services/aiService.tsx"; // API service you will create
 
 export default function AiSuggestions() {
     const [query, setQuery] = useState("");
@@ -67,10 +67,14 @@ export default function AiSuggestions() {
                         {results && (
                             <Card className="mt-4 bg-gray-50">
                                 <CardContent>
-                                    <p>{results}</p>
+                                    <div
+                                        className="prose"
+                                        dangerouslySetInnerHTML={{ __html: results }}
+                                    />
                                 </CardContent>
                             </Card>
                         )}
+
                     </CardContent>
                 </Card>
             </div>
