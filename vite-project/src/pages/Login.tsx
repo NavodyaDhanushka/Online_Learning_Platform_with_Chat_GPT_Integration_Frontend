@@ -24,7 +24,7 @@ export default function Login() {
 
     const onSubmit = async (data: LoginFormData) => {
         try {
-            const res = await fetch("http://localhost:5000/api/users/login", {
+            const res = await fetch("http://3.1.204.225:5000/api/users/login", {
                 method: "POST",
                 body: JSON.stringify(data),
                 headers: { "Content-Type": "application/json" },
