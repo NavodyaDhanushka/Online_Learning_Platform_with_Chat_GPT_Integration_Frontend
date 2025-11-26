@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Swal from "sweetalert2";
 
 import {
@@ -14,6 +14,7 @@ import {
     deleteCourse,
     updateCourse
 } from "@/services/courseService";
+
 
 export default function MyCourses() {
     const navigate = useNavigate();
@@ -30,10 +31,10 @@ export default function MyCourses() {
             let data: any[] = [];
 
             if (user.role === "student") {
-                const response = await getEnrolledUsers(user._id);
+                const response = await getEnrolledUsers();
                 data = response.courses || [];
             } else if (user.role === "instructor") {
-                const response = await getAssignCourses(user._id);
+                const response = await getAssignCourses();
                 data = response.data || [];
             }
 
@@ -107,7 +108,7 @@ export default function MyCourses() {
         }
 
         try {
-            const updated = await updateCourse(selectedCourse._id, {
+            await updateCourse(selectedCourse._id, {
                 title: selectedCourse.title,
                 description: selectedCourse.description,
                 content: selectedCourse.content,
