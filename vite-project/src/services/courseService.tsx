@@ -1,10 +1,10 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/courses";
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Attach token automatically
 const api = axios.create({
-    baseURL: API_URL,
+    baseURL: `${API_URL}/courses`,
 });
 
 api.interceptors.request.use((config) => {

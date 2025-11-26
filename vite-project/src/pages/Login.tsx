@@ -8,6 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Swal from "sweetalert2";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
 const loginSchema = z.object({
     username: z.string(),
     password: z.string().min(8).max(100),
@@ -24,13 +27,14 @@ export default function Login() {
 
     const onSubmit = async (data: LoginFormData) => {
         try {
-            const res = await fetch("http://3.1.204.225:5000/api/users/login", {
+            const res = await fetch(`${BASE_URL}/users/login`, {
                 method: "POST",
                 body: JSON.stringify(data),
                 headers: { "Content-Type": "application/json" },
             });
 
             const result = await res.json();
+
 
             if (!res.ok){
                 Swal.fire({
