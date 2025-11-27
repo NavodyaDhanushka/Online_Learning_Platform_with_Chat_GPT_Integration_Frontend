@@ -1,41 +1,60 @@
-import { useEffect, useState } from "react";
+import Navbar from "@/components/Navbar.tsx";
+import { useEffect, useState} from "react";
 import { useParams } from "react-router-dom";
-import Swal from "sweetalert2";
-import Navbar from "@/components/Navbar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-
+import { Button } from "@/components/ui/button.tsx";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCourseById, enrollToCourse } from "@/services/courseService";
+import Swal from "sweetalert2";
 
-export default function CourseDetails() {
+interface Student {
+    _id: string;
+    name: string;
+}
+
+interface Instructor {
+    _id: string;
+    name: string;
+}
+
+interface Course {
+    _id: string;
+    title: string;
+    description: string;
+    content: string;
+    instructor: Instructor;
+    enrolledUsers: Student[];
+    isEnrolled?: boolean;
+}
+
+export default function CourseDetail() {
     const { id } = useParams();
-    const [course, setCourse] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [enrolling, setEnrolling] = useState(false);
+    const [ loading, setLoading ] = useState(true);
+    const [ enrolling, setEnrolling ] = useState(false);
+    const [ course, setCourse ] = useState<Course | null >(null);
 
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const isStudent = user?.role === "student";
     const isInstructor = user?.role === "instructor";
 
     useEffect(() => {
-        const fetchCourse = async () => {
+        const fetchCourses = async () => {
             try {
                 const data = await getCourseById(id!);
                 setCourse(data);
-            } catch (err) {
-                console.error(err);
+            } catch (err){
+                console.log(err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchCourse();
+        fetchCourses();
     }, [id]);
 
     if (loading || !course) {
         return (
             <>
-                <Navbar />
+            <Navbar/>
                 <div className="flex justify-center items-center h-[70vh]">
                     <Loader2 className="w-8 h-8 animate-spin" />
                 </div>
@@ -43,11 +62,9 @@ export default function CourseDetails() {
         );
     }
 
-    // 👇 Now we use backend value directly
     const alreadyEnrolled = course.isEnrolled;
-
     const handleEnroll = async () => {
-        if (alreadyEnrolled) return; // stop double clicking
+        if (alreadyEnrolled) return;
 
         const result = await Swal.fire({
             title: "Enroll in this course?",
@@ -63,9 +80,8 @@ export default function CourseDetails() {
                 setEnrolling(true);
                 await enrollToCourse(id!);
 
-                // Fetch fresh data with isEnrolled: true
-                const updatedCourse = await getCourseById(id!);
-                setCourse(updatedCourse);
+                const  updateCourse = await getCourseById(id!);
+                setCourse(updateCourse);
 
                 await Swal.fire({
                     icon: "success",
@@ -73,14 +89,14 @@ export default function CourseDetails() {
                     text: "You have successfully enrolled in this course.",
                 });
             } catch (err) {
-                console.error(err);
+                console.log(err);
                 await Swal.fire({
                     icon: "error",
                     title: "Enrollment Failed",
                     text: "Something went wrong. Please try again later.",
                 });
             } finally {
-                setEnrolling(false);
+                setLoading(false);
             }
         }
     };
@@ -101,7 +117,6 @@ export default function CourseDetails() {
                         <p><strong>Content:</strong> {course.content}</p>
                         <p><strong>Instructor:</strong> {course.instructor?.name}</p>
 
-                        {/* STUDENT VIEW */}
                         {isStudent && (
                             <Button
                                 onClick={handleEnroll}
@@ -118,7 +133,6 @@ export default function CourseDetails() {
                     </CardContent>
                 </Card>
 
-                {/* INSTRUCTOR VIEW: Enrolled Students */}
                 {isInstructor && course.enrolledUsers?.length > 0 && (
                     <Card className="max-w-2xl w-full mt-4">
                         <CardHeader>
@@ -127,7 +141,7 @@ export default function CourseDetails() {
 
                         <CardContent>
                             <ul className="space-y-2">
-                                {course.enrolledUsers.map((student: any) => (
+                                {course.enrolledUsers.map((student: Student) => (
                                     <li key={student._id} className="p-2 border rounded bg-gray-50">
                                         <strong>{student.name}</strong>
                                     </li>
@@ -143,4 +157,6 @@ export default function CourseDetails() {
             </div>
         </>
     );
+
+
 }

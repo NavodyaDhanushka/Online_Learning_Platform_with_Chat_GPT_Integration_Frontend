@@ -54,7 +54,7 @@ export default function Login() {
                 timer: 1500,
                 showConfirmButton: false,
             });
-            navigate("/");
+            navigate("/home");
         } catch (error) {
             console.log(error);
             Swal.fire({

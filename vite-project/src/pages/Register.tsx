@@ -1,13 +1,14 @@
-import {useForm} from "react-hook-form";
-import {z} from "zod";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router";
+import { Button } from "@/components/ui/button.tsx";
+import { Input } from "@/components/ui/input.tsx";
+import { Label } from "@/components/ui/label.tsx";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import Navbar from "@/components/Navbar";
-
+import Navbar from "@/components/Navbar.tsx";
+import Swal from "sweetalert2";
 
 const registerSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters"),
@@ -22,21 +23,24 @@ const registerSchema = z.object({
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-type RegisterForData = z.infer<typeof registerSchema>;
+type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function Register() {
-    const { register, handleSubmit, formState: { errors }, setValue } = useForm<RegisterForData>({
-        resolver: zodResolver(registerSchema)
+    const navigate = useNavigate();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+    } = useForm<RegisterFormData>({
+        resolver: zodResolver (registerSchema),
     });
 
-    // Get logged-in user from localStorage (or context)
     const loggedInUser = JSON.parse(localStorage.getItem("user") || "null");
     const isInstructor = loggedInUser?.role === "instructor";
-
-    // Only instructors can select both student and instructor roles
     const availableRoles = isInstructor ? ["student", "instructor"] : ["student"];
 
-    const onSubmit = async (data: RegisterForData) => {
+    const onSubmit = async (data: RegisterFormData) => {
         try {
             const response = await fetch(`${BASE_URL}/users/register`, {
                 method: "POST",
@@ -44,25 +48,31 @@ export default function Register() {
                 headers: { "Content-Type": "application/json" },
             });
 
-            const result = await response.json();
+            await response.json();
 
             if (response.ok) {
-                alert("User registered successfully!");
-                console.log("Response:", result);
-            } else {
-                alert(result.message || "Registration failed");
-                console.error("Error:", result);
+                Swal.fire({
+                    icon: "success",
+                    title: "Registration Successful!",
+                    text: "You can login with your new account.",
+                    confirmButtonColor: "#3085d6",
+                }).then(() => {
+                    navigate("/");
+                });
             }
         } catch (error) {
-            console.error("Network error:", error);
-            alert("Network error. Please try again.");
+            console.log("Network error:", error);
+            await Swal.fire({
+                icon: "error",
+                title: "Network Error",
+                text: "Please check your connection and try again.",
+            });
         }
     };
 
-
     return (
         <>
-            {isInstructor && <Navbar />}   {/* ✅ Show Navbar only for instructors */}
+            {isInstructor && <Navbar />}
 
             <div className="flex justify-center items-center min-h-screen bg-gray-50 pt-24">
                 <Card className="w-[400px]">
@@ -76,14 +86,14 @@ export default function Register() {
                             {/* Name */}
                             <div>
                                 <Label>Name</Label>
-                                <Input {...register("name")} placeholder="John Doe" />
+                                <Input {...register("name")} placeholder="Name" />
                                 {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
                             </div>
 
                             {/* Username */}
                             <div>
                                 <Label>Username</Label>
-                                <Input {...register("username")} placeholder="johndoe" />
+                                <Input {...register("username")} placeholder="Username" />
                                 {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
                             </div>
 
@@ -122,7 +132,10 @@ export default function Register() {
                             <Button type="submit" className="w-full">Register</Button>
 
                             <p className="text-sm text-center mt-2">
-                                Already have an account? <a className="text-blue-500" href="/login">Login</a>
+                                Already have an account?{" "}
+                                <a className="text-blue-500" href="/login">
+                                    Login
+                                </a>
                             </p>
 
                         </form>
@@ -131,5 +144,4 @@ export default function Register() {
             </div>
         </>
     );
-
 }

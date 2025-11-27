@@ -1,14 +1,15 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Navbar from "@/components/Navbar";
+import { useState } from "react";
+import { useForm} from "react-hook-form";
+import { zodResolver} from "@hookform/resolvers/zod";
+import { useNavigate} from "react-router-dom";
+import { Button} from "@/components/ui/button.tsx";
+import { Input} from "@/components/ui/input.tsx";
+import { Label } from "@/components/ui/label.tsx";
+import { createCourse} from "@/services/courseService.tsx";
+import Navbar from "@/components/Navbar.tsx";
+import Swal from "sweetalert2";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { createCourse } from "@/services/courseService";
-import { useNavigate } from "react-router-dom";
 
 const createCourseSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters"),
@@ -21,34 +22,44 @@ type CreateCourseFormData = z.infer<typeof createCourseSchema>;
 export default function CreateCourse() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const { register, handleSubmit, formState: { errors } } = useForm<CreateCourseFormData>({
+        resolver: zodResolver(createCourseSchema),
+    });
 
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const user = JSON.parse(localStorage.getItem("user") || "{}" );
 
-    // Only instructors can create courses
     if (user.role !== "instructor") {
         return (
             <>
                 <Navbar />
                 <div className="p-6 text-center text-red-500">
-                    You are not authorized to create courses.
+                    You are not authorized to create a course.
                 </div>
             </>
         );
     }
 
-    const { register, handleSubmit, formState: { errors } } = useForm<CreateCourseFormData>({
-        resolver: zodResolver(createCourseSchema),
-    });
-
     const onSubmit = async (data: CreateCourseFormData) => {
         setLoading(true);
         try {
             await createCourse(data);
-            alert("Course created successfully!");
-            navigate("/"); // Redirect to home or courses page
+
+            await Swal.fire({
+                icon: "success",
+                title: "Course Created!",
+                text: "Your course has been added successfully.",
+                timer: 2000,
+                showConfirmButton: false,
+            });
+            navigate("/home");
         } catch (error) {
-            console.error(error);
-            alert("Failed to create course.");
+            console.log(error);
+
+            await Swal.fire({
+                icon: "error",
+                title: "Creation Failed",
+                text: "Something went wrong while creating the course.",
+            });
         } finally {
             setLoading(false);
         }

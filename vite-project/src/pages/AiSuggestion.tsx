@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import Swal from "sweetalert2";
 
-import { getAiCourseSuggestions } from "@/services/aiService.tsx"; // API service you will create
+import { getAiCourseSuggestions } from "@/services/aiService.tsx";
 
 export default function AiSuggestions() {
     const [query, setQuery] = useState("");
@@ -15,7 +15,7 @@ export default function AiSuggestions() {
 
     const handleSubmit = async () => {
         if (!query.trim()) {
-            Swal.fire({
+             Swal.fire({
                 icon: "warning",
                 title: "Empty Question",
                 text: "Please type a question before submitting.",
@@ -25,8 +25,8 @@ export default function AiSuggestions() {
 
         try {
             setLoading(true);
-            const response = await getAiCourseSuggestions(query); // Call backend AI API
-            setResults(response.answer); // response.answer contains AI result
+            const response = await getAiCourseSuggestions(query);
+            setResults(response.answer);
         } catch (err) {
             console.error(err);
             Swal.fire({

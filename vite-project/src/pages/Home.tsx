@@ -8,6 +8,7 @@ interface Course {
     _id: string;
     title: string;
     description: string;
+    isEnrolled?: boolean;
 }
 
 export default function Home() {
@@ -49,6 +50,7 @@ export default function Home() {
                     id={course._id}
                     title={course.title}
                     description={course.description}
+                    isEnrolled={course.isEnrolled}
                     />
                 )))}
             </div>
