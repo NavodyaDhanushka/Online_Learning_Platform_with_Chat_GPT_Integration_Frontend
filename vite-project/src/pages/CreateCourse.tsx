@@ -77,7 +77,7 @@ export default function CreateCourse() {
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                             <div>
                                 <Label>Title</Label>
-                                <Input {...register("title")} placeholder="JavaScript Basics" />
+                                <Input {...register("title")} placeholder="Title" />
                                 {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
                             </div>
 

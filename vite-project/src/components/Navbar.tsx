@@ -10,7 +10,7 @@ export default function Navbar(){
 
     const handleLogout = () => {
         localStorage.removeItem("user");
-        navigate("/login");
+        navigate("/");
     };
 
     return(
@@ -41,7 +41,7 @@ export default function Navbar(){
                 {user?(
                     <Button onClick={handleLogout}>Logout</Button>
                 ) : (
-                    <Link to="/login">
+                    <Link to="/">
                         <Button variant={location.pathname === "/" ? "default" : "outline"}>Login</Button>
                     </Link>
                 )}

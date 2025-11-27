@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
 interface Student {
     _id: string;
     name: string;
+    username: string;
 }
 
 interface Instructor {
@@ -67,7 +68,7 @@ export default function CourseDetail() {
         if (alreadyEnrolled) return;
 
         const result = await Swal.fire({
-            title: "Enroll in this course?",
+            title: "Enrolling Process",
             text: "Are you sure you want to enroll?",
             icon: "question",
             showCancelButton: true,
@@ -141,9 +142,9 @@ export default function CourseDetail() {
 
                         <CardContent>
                             <ul className="space-y-2">
-                                {course.enrolledUsers.map((student: Student) => (
+                                {course.enrolledUsers.map((student: Student, index: number) => (
                                     <li key={student._id} className="p-2 border rounded bg-gray-50">
-                                        <strong>{student.name}</strong>
+                                        {index + 1}.<strong>{student.name}</strong> ({student.username})
                                     </li>
                                 ))}
                             </ul>

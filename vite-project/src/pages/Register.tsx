@@ -13,8 +13,8 @@ import Swal from "sweetalert2";
 const registerSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters"),
     username: z.string().min(3, "Username must be at least 3 characters"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Confirm password is required"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(8, "Confirm password is required"),
     role: z.enum(["student", "instructor"], "Role is required"),
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -48,7 +48,7 @@ export default function Register() {
                 headers: { "Content-Type": "application/json" },
             });
 
-            await response.json();
+            const result = await response.json();
 
             if (response.ok) {
                 Swal.fire({
@@ -59,6 +59,12 @@ export default function Register() {
                 }).then(() => {
                     navigate("/");
                 });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Registration Failed!",
+                    text: result.message || "User already exists!",
+                })
             }
         } catch (error) {
             console.log("Network error:", error);
@@ -133,7 +139,7 @@ export default function Register() {
 
                             <p className="text-sm text-center mt-2">
                                 Already have an account?{" "}
-                                <a className="text-blue-500" href="/login">
+                                <a className="text-blue-500" href="/">
                                     Login
                                 </a>
                             </p>
