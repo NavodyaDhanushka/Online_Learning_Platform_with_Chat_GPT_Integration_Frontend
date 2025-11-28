@@ -55,7 +55,8 @@ Start the server
   npm run start
 ```
 ## Environment Variables
-To run this project, you will need to add the following environment variables to your .env file for 
+To run this project, you will need to add the following environment variables to your .env file for
+https://drive.google.com/drive/folders/1qB8KWz46SXa-Z9ni82nXLBSciCvRYnZt?usp=drive_link
 #### Frontend
 
 `VITE_API_BASE_URL`= 
