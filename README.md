@@ -66,9 +66,6 @@ Your application is successfully deployed on an AWS EC2 instance, making it acce
 
 👉 http://3.1.204.225:3000
 
-
-
-
 ## Demo
 
 [Demo](https://drive.google.com/drive/folders/165_WSWGV3IcZmMqA3-ztrWa3m-oEG_f-?usp=drive_link)
