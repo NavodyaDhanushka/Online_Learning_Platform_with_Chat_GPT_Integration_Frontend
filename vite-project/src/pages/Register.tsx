@@ -89,35 +89,30 @@ export default function Register() {
                     <CardContent>
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
-                            {/* Name */}
                             <div>
                                 <Label>Name</Label>
                                 <Input {...register("name")} placeholder="Name" />
                                 {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
                             </div>
 
-                            {/* Username */}
                             <div>
                                 <Label>Username</Label>
                                 <Input {...register("username")} placeholder="Username" />
                                 {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
                             </div>
 
-                            {/* Password */}
                             <div>
                                 <Label>Password</Label>
                                 <Input type="password" {...register("password")} />
                                 {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
                             </div>
 
-                            {/* Confirm Password */}
                             <div>
                                 <Label>Confirm Password</Label>
                                 <Input type="password" {...register("confirmPassword")} />
                                 {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
                             </div>
 
-                            {/* Role */}
                             <div>
                                 <Label>Role</Label>
                                 <Select onValueChange={(value) => setValue("role", value as "student" | "instructor")}>
