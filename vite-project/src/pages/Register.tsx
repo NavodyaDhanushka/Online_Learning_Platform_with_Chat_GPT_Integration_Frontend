@@ -51,10 +51,15 @@ export default function Register() {
             const result = await response.json();
 
             if (response.ok) {
+                const successMessage =
+                    data.role === "instructor"
+                        ? "Instructor added successfully!"
+                        : "Registration Successful! You can login with your new account.";
+
                 Swal.fire({
                     icon: "success",
-                    title: "Registration Successful!",
-                    text: "You can login with your new account.",
+                    title: "Success!",
+                    text: successMessage,
                     confirmButtonColor: "#3085d6",
                 }).then(() => {
                     navigate("/");
